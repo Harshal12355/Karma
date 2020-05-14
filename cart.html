@@ -127,12 +127,11 @@
                             <tr>
                                 <th scope="col">Product</th>
                                 <th scope="col">Price</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Total</th>
+                                <th scope="col">Delete</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
+                        <tbody id="table">
+                            <tr>                   
                                 <td>
                                     <div class="media">
                                         <div class="d-flex">
@@ -243,10 +242,67 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div
+							class="newsletter_form d-flex flex-md-row flex-column flex-xs-column align-items-center justify-content-lg-end justify-content-center">
+							<button id="newsletter_submit" type="button" class="primary-btn"
+								data-toggle="modal" data-target="#exampleModal" value="Submit">Buy</button>
+						</div> 
                 </div>
             </div>
         </div>
     </section>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Your information</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<form action="https://formspree.io/Akilanselva@hotmail.com" method="POST">
+							<div class="modal-body">
+								<div style="display:none" id="receipt">
+									<!-- <textarea name="purchases">
+											item 1 - 3 AED
+											item 1 - 3 AED
+					
+											Total: 6 AED
+										</textarea>-->
+
+								</div>
+								<div class="form-group">
+									<label for="full_name" class="col-form-label">Full Name:</label>
+									<input type="text" name="fullname" class="form-control" id="full-name">
+								</div>
+								<div class="form-group">
+									<label for="email_id" class="col-form-label">Email id:</label>
+									<input type="text" name="email" class="form-control" id="Email-id">
+								</div>
+								<div class="form-group">
+									<label for="mobile_no" class="col-form-label">Mobile no:</label>
+									<input type="text" class="form-control" id="mobile_no" name="mobileno"
+										placeholder="Please include with country code">
+								</div>
+								<div class="form-group">
+									<label for="Shipping-address" class="col-form-label">Shipping address:</label>
+									<textarea name="shipping address" class="form-control"
+										id="Shipping-address"></textarea>
+								</div>
+								<div class="form-group">
+									<label for="Comments" class="col-form-label">Comments:</label>
+									<textarea name="Comments" class="form-control" id="Comments"></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-primary">Place Order</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
     <!--================End Cart Area =================-->
 
     <!-- start footer Area -->
@@ -345,7 +401,90 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<!--gmaps Js-->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjCGmQ0Uq4exrzdcL6rvxywDDOvfAu6eE"></script>
 	<script src="js/gmaps.min.js"></script>
-	<script src="js/main.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            if (localStorage.getItem('facebook') === null) {
+                console.log("here");
+                var arr = new Array();
+                localStorage.setItem('facebook', JSON.stringify(arr));
+            }
+
+            var arr_json = JSON.parse(localStorage.getItem('facebook'));
+
+            $("#checkout_items").html(arr_json.length);
+            console.log(arr_json.length);
+
+
+            var arr_json = JSON.parse(localStorage.getItem('facebook'));
+            $("#table").html("");
+            var receipt = "<textarea name=\"purchases\">";
+            var sum = 0;
+            for (var i = 0; i < arr_json.length; i++) {
+                $("#table").append(`<tr>
+                      <td>`+ arr_json[i].name + `</td>
+                      <td>`+ arr_json[i].price + `</td>
+                      <td><a href="#"  onclick="delete_item(`+ i + `)">
+                                    <i class="fa fa-window-close" aria-hidden="true" style="color:red; font-size:1.5rem;"></i>
+                       </a></td>
+                      </tr>
+                 `);
+                receipt += "\n" + arr_json[i].name + " - " + arr_json[i].price + "\n";
+                sum += arr_json[i].price;
+
+            }
+
+            receipt += "\n\nSum: " + sum + "\n</textarea>";
+            console.log(receipt);
+            $("#receipt").html(receipt);
+
+            $("#table").append(`<tr>
+                      <td style="font-weight:700">Total : </td>
+                      <td style="font-weight:700">$`+ sum + `</td>
+                      <td></td>
+                      </tr>
+            `);
+        });
+
+        function delete_item(id) {
+            $("#table").html("");
+            var arr_json = JSON.parse(localStorage.getItem('facebook'));
+            if (id > -1) {
+                arr_json.splice(id, 1);
+            }
+            console.log(id);
+            localStorage.setItem('facebook', JSON.stringify(arr_json));
+            console.log(arr_json.length);
+            var receipt = "<textarea name=\"purchases\">";
+            var sum = 0;
+            $("#receipt").html("");
+            for (var i = 0; i < arr_json.length; i++) {
+                $("#table").append(`<tr>
+                      <td>`+ arr_json[i].name + `</td>
+                      <td>`+ arr_json[i].price + `</td>
+                      <td><a href="#"  onclick="delete_item(`+ i + `)">
+                                    <i class="fa fa-window-close" aria-hidden="true" style="color:red; font-size:1.5rem;"></i>
+                       </a></td>
+                      </tr>
+                 `);
+                receipt += "\n" + arr_json[i].name + " - " + arr_json[i].price + "\n";
+                sum += arr_json[i].price;
+
+            }
+            receipt += "\n\nSum: $" + sum + "\n</textarea>";
+            $("#receipt").html(receipt);
+            console.log(receipt);
+            $("#checkout_items").html(arr_json.length);
+
+            $("#table").append(`<tr>
+                      <td style="font-weight:700">Total : </td>
+                      <td style="font-weight:700">$`+ sum + `</td>
+                      <td></td>
+                      </tr>
+            `);
+        }
+    </script>
 </body>
 
 </html>
